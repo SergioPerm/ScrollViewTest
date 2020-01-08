@@ -15,6 +15,8 @@
 
 @property (assign, nonatomic) CGFloat keyboardHeight;
 
+@property (assign, nonatomic) BOOL willMakeKeyboardOffset;
+
 @end
 
 @implementation ViewController
@@ -74,6 +76,8 @@
         return;
     }
     
+    self.willMakeKeyboardOffset = YES;
+    
     [UIView animateWithDuration:0.3f
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState
@@ -99,16 +103,24 @@
 
 - (void) keyboardWillHide:(NSNotification*) notofication {
     
-    [UIView animateWithDuration:0.3f
-                          delay:0
-                        options:UIViewAnimationOptionBeginFromCurrentState
-                     animations:^{
+    if (self.willMakeKeyboardOffset) {
         
-        self.contstraintContentHeight.constant -=  self.keyboardHeight;
-        self.scrollView.contentOffset = self.lastOffset;
+        [UIView animateWithDuration:0.3f
+                              delay:0
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+            
+            self.contstraintContentHeight.constant -= self.keyboardHeight;
+            self.scrollView.contentOffset = self.lastOffset;
+            
+        } completion:^(BOOL finished) {
+        }];
         
-    } completion:^(BOOL finished) {
-    }];
+        self.willMakeKeyboardOffset = NO;
+        
+        NSLog(@"%f", self.keyboardHeight);
+        
+    }
     
     self.keyboardHeight = 0;
     
